@@ -1,18 +1,12 @@
-from code import interact
 import datetime
-from distutils import text_file
-from os import stat
 import dash
 from dash.dependencies import Output, Input
 from dash import dcc
 from dash import html
-import plotly
-import plotly.graph_objs as go
 import logging
 import sys
-import traceback
-import pickle
-
+import cv2
+from flask import Flask, Response
 
 text_buffer = ''
 status = 'Waiting'
@@ -20,11 +14,32 @@ speech_timeout = 5
 interval = 300 #[ms]
 remaining_time = 0
 
+# Camera Feed
+class VideoCamera(object):
+    def __init__(self):
+        self.video = cv2.VideoCapture('rtsp://192.168.0.114:8554/unicast')  #rtsp://192.168.0.114:8554/unicast
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        success, image = self.video.read()
+        ret, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+# End of Camera Feed
+
+
+
 # Speech recognition
 import speech_recognition as sr
 def recognize_speech_from_mic():
-    path = ''
-
     global status, speech_timeout
     recognizer_module = sr.Recognizer()
     microphone_module = sr.Microphone()
@@ -42,7 +57,7 @@ def recognize_speech_from_mic():
         "transcription": 'Unable to recognize text'
     }
     try:
-        response["transcription"] = recognizer_module.recognize_google(audio)
+        response["transcription"] = recognizer_module.recognize_google(audio, language="pl-PL")
     except sr.RequestError:
         response["success"] = False
         response["error"] = "API unavailable"
@@ -58,40 +73,59 @@ def CreateLogger():
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
+
+def SpeechToText():
+    return [
+    dcc.Interval(
+            id = 'update-timer',
+            interval = interval,
+            n_intervals = 0
+        ),
+        
+    html.Div([
+        html.Button('Clear Text', id='clear_button', style={'display':'inline-block'}),
+        html.Button('Start recognition', id='speech_button', style={'display':'inline-block',"margin-left": "2px"}),
+        html.P(id='status-text-output', children = ['Status: '], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px"}),
+        html.B(id='status-output', children = ['Waiting'], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px", 'color': 'red'})
+        ]),
+    html.B( children = ['Speech lenght: '], style={'whiteSpace': 'pre-line','display':'inline-block'}),
+    dcc.Slider(
+        id = 'time-slider',
+        min=5,
+        max=60,
+        step=5,
+        value=5,
+        dots = True,
+        tooltip={"placement": "bottom", "always_visible": True}
+    ),
+    html.Div([
+    html.B(children = ['Remaining time:'], style={'whiteSpace': 'pre-line','display':'inline-block'}),
+    html.B(id='timer', children = ['0'], style={'whiteSpace': 'pre-line','display':'inline-block'}),
+    html.B(children = ['s'], style={'whiteSpace': 'pre-line','display':'inline-block'})
+    ]),
+    html.Hr(),
+    html.Div(id='text-output', children = [''], style={'whiteSpace': 'pre-line'}),
+
+        ]
+
+def VideoFeed():
+    return[
+    html.H1("Webcam Test"),
+    html.Img(src="/video_feed")
+    ]
+
+
 def CreateWebPage():
     global interval
     app = dash.Dash(__name__)
 
     app.layout = html.Div([
-        dcc.Interval(
-                id = 'update-timer',
-                interval = interval,
-                n_intervals = 0
-            ),
-
-
-        html.Div([
-            html.Button('Clear Text', id='clear_button', style={'display':'inline-block'}),
-            html.Button('Start recognition', id='speech_button', style={'display':'inline-block',"margin-left": "2px"}),
-            html.P(id='status-text-output', children = ['Status: '], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px"}),
-            html.B(id='status-output', children = ['Waiting'], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px"})
-            ]),
-        html.B( children = ['Speech lenght: '], style={'whiteSpace': 'pre-line','display':'inline-block'}),
-        dcc.Slider(
-            id = 'time-slider',
-            min=5,
-            max=60,
-            step=5,
-            value=5,
-            dots = True,
-            tooltip={"placement": "bottom", "always_visible": True},
-        ),
-        html.Div([
-        html.B(id='timer', children = ['0'], style={'whiteSpace': 'pre-line','display':'inline-block'}),
-        html.B(children = ['s'], style={'whiteSpace': 'pre-line','display':'inline-block'})
+        dcc.Tabs(id="tabs", value='tab_1', children=[
+        dcc.Tab(label='Speech to Text', value='tab_1'),
+        dcc.Tab(label='Video Feed', value='tab_2'),
         ]),
-        html.Hr(),
-        html.Div(id='text-output', children = [''], style={'whiteSpace': 'pre-line'}),
+        html.Div(id='tabs_content'),
+
 
         # Hidden divs for handling unnecessary inputs/outputs
         html.Div(id='hidden-div', style={'display':'none'}),
@@ -101,6 +135,17 @@ def CreateWebPage():
 
 
 # CALLBACKS
+    @app.callback ( Output('tabs_content', 'children'),
+                    Input('tabs', 'value'))
+    def render_content(tab):
+        # Global graphs data
+        if tab == 'tab_1':
+            return (SpeechToText())
+
+        elif tab == 'tab_2':
+            return (VideoFeed())
+
+
 
     @app.callback(
         Output('hidden-div', 'children'),
@@ -128,18 +173,30 @@ def CreateWebPage():
     @app.callback(
         Output('text-output', 'children'),
         Output('status-output', 'children'),
+        Output('status-output', 'style'),
         Output('timer', 'children'),
         Input('update-timer', 'n_intervals'),
         Input('time-slider', 'value')
     )
     def update_text(n_intervals,value):
         global text_buffer, status, speech_timeout, remaining_time, interval
+        color = 'red'
         speech_timeout = value
         if remaining_time > 0 and status == "Listening":
             remaining_time = round(remaining_time - (interval/1000),1)
+            color = 'green'
         if remaining_time < 0 or status == "Translating":
             remaining_time = 0
-        return text_buffer, status, remaining_time
+        
+        return text_buffer, status, {'color': color}, remaining_time
+
+
+    @app.server.route('/video_feed')
+    def video_feed():
+        return Response(gen(VideoCamera()),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
 
     return app
 
