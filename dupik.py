@@ -26,6 +26,7 @@ client.subscribe([("position", 0), ])
 
 
 while True:
+    print(dir)
     motion = 0
     if dir == 1:
         print(dir)
