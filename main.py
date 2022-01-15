@@ -20,11 +20,9 @@ def callback_pir(channel_pir):
 
 GPIO.add_event_detect(channel, GPIO.BOTH, bouncetime=300)  # let us know when the pin goes HIGH or LOW
 GPIO.add_event_callback(channel, callback)  # assign function to GPIO PIN, Run function on change
-GPIO.add_event_detect(channel_pir, GPIO.BOTH, bouncetime=300)  # let us know when the pin goes HIGH or LOW
+GPIO.add_event_detect(channel_pir, GPIO.BOTH, bouncetime=1000)  # let us know when the pin goes HIGH or LOW
 GPIO.add_event_callback(channel_pir, callback_pir)  # assign function to GPIO PIN, Run function on change
 
 # infinite loop
-j=0
-z=0
 while True:
     time.sleep(1)
