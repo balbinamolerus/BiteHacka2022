@@ -12,8 +12,8 @@ def callback(channel):
         else:
                 print ('Sound Detected!')
 
-def callback_pir(channel):
-        if GPIO.input(channel):
+def callback_pir(channel_pir):
+        if GPIO.input(channel_pir):
                 print ('switch')
         else:
                 print ('switch')
