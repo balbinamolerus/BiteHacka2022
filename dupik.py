@@ -9,6 +9,7 @@ while True:
         if pir.wait_for_motion() == True:
             motion += 1
         sleep(0.01)
-    if motion > 10:
-        print('alarm')
-        sleep(0.1)
+        if motion > 10:
+            print('alarm')
+            sleep()
+            break
