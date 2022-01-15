@@ -5,7 +5,7 @@ servo = Servo(17)
 
 while True:
     servo.mid()
-    print('mid')
+    print('mid2')
     sleep(0.5)
     x = servo.min()
     print('min')
