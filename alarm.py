@@ -1,42 +1,37 @@
-import time, audioop
 import pyaudio
+import wave
 
-# Initialisation for PyAudio
-CHUNK = 1024
 FORMAT = pyaudio.paInt16
-CHANNELS = 1
+CHANNELS = 2
 RATE = 44100
-RECORD_SECONDS = 1
+CHUNK = 1024
+RECORD_SECONDS = 5
+WAVE_OUTPUT_FILENAME = "file.wav"
 
-threshold = 10
-reading = 0
-previousreading = 0
-
-# PyAudio Object
 audio = pyaudio.PyAudio()
 
-while True:
-        stream = audio.open(format=FORMAT,
-                channels=CHANNELS,
-                rate=RATE,
-                input=True,
-                frames_per_buffer=CHUNK)
-        frames = []
+# start Recording
+stream = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE, input=True,
+                    frames_per_buffer=CHUNK)
+print
+"recording..."
+frames = []
 
-        for i in range(0, int(RATE/CHUNK*RECORD_SECONDS)):
-                data = stream.read(70)
-                frames.append(data)
-                time.sleep(0.001)
+for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+    data = stream.read(CHUNK)
+    frames.append(data)
+print
+"finished recording"
 
-        reading = audioop.max(data, 2)
-        if reading - previousreading > threshold:
-                print(reading)
-        previousreading = reading
-
-        stream.stop_stream()
-        stream.close()
-
-# Clearing the resources
+# stop Recording
 stream.stop_stream()
 stream.close()
 audio.terminate()
+
+waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+waveFile.setnchannels(CHANNELS)
+waveFile.setsampwidth(audio.get_sample_size(FORMAT))
+waveFile.setframerate(RATE)
+waveFile.writeframes(b''.join(frames))
+waveFile.close()
