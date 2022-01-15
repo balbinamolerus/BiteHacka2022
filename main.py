@@ -21,7 +21,6 @@ while True:
     i=GPIO.input(channel_pir)
     if i==0:                 #When output from motion sensor is LOW
         z=z+1
-        print(j)
         if z==2:
             j=0
             print ("No Intruder detected")
