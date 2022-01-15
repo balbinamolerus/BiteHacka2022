@@ -5,7 +5,7 @@ GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(14, GPIO.IN)
 
-GPIO.write(14, LOW)
+GPIO.output(14, 0)
 
 while True:
     if GPIO.input(14):
