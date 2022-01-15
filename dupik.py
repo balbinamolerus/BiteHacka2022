@@ -31,6 +31,7 @@ while True:
             motion += 1
         sleep(0.01)
         if motion > 10:
-            print('alarm')
+            # print('alarm')
+            client.publish("alarm", "pir", qos=0, retain=False)
             sleep(2)
             break
