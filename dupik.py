@@ -29,12 +29,12 @@ client.subscribe([("position", 0), ])
 
 while True:
     motion = 0
-    if direction == 1:
+    if direction == -1:
         servo.max()
         time.sleep(0.02)
         servo.detach()
         direction = 0
-    elif direction == -1:
+    elif direction == 1:
         servo.min()
         time.sleep(0.02)
         servo.detach()
