@@ -1,2 +1,2 @@
 print('dupa')
-print('Klubla')
+print('Klublas')
