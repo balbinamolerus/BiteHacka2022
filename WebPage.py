@@ -7,17 +7,19 @@ import logging
 import sys
 import cv2
 from flask import Flask, Response
+import paho.mqtt.client as mqtt
 
 text_buffer = ''
 status = 'Waiting'
 speech_timeout = 5
 interval = 300 #[ms]
 remaining_time = 0
+client = None
 
 # Camera Feed
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture('rtsp://192.168.0.114:8554/unicast')  #rtsp://192.168.0.114:8554/unicast
+        self.video = cv2.VideoCapture('rtsp://192.168.0.114:8554/unicast')
 
     def __del__(self):
         self.video.release()
@@ -30,9 +32,12 @@ class VideoCamera(object):
 
 def gen(camera):
     while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        try:
+            frame = camera.get_frame()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        except:
+            pass
 # End of Camera Feed
 
 
@@ -111,6 +116,15 @@ def SpeechToText():
 def VideoFeed():
     return[
     html.H1("Webcam Test"),
+    dcc.Slider(
+        id = 'position-slider',
+        min=0,
+        max=100,
+        step=10,
+        value=0,
+        dots = True,
+        tooltip={"placement": "left", "always_visible": True}
+    ),
     html.Img(src="/video_feed")
     ]
 
@@ -130,6 +144,7 @@ def CreateWebPage():
         # Hidden divs for handling unnecessary inputs/outputs
         html.Div(id='hidden-div', style={'display':'none'}),
         html.Div(id='hidden-div2', style={'display':'none'}),  
+        html.Div(id='hidden-div3', style={'display':'none'}),  
         
     ])
 
@@ -166,7 +181,7 @@ def CreateWebPage():
         prevent_initial_call=True
     )
     def clear_output(n_clicks):
-        global text_buffer
+        global text_buffer, client
         text_buffer = ''
         return dash.no_update
 
@@ -197,6 +212,17 @@ def CreateWebPage():
                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+    @app.callback(
+        Output('hidden-div3', 'children'),
+        Input('position-slider', 'value'),
+        prevent_initial_call=True
+    )
+    def send_position(value):
+        global client
+        client.publish("position", value, qos=0, retain=False)
+        text_buffer = ''
+        return dash.no_update
+
 
     return app
 
@@ -204,14 +230,20 @@ def CreateWebPage():
 ###############################################################################################################################
 
 def main():
-    global received_flag,received_frame
+    global received_flag,received_frame, client
 
     try:
         CreateLogger()
 
+        broker_address = "192.168.0.123"
+        client = mqtt.Client()
+        client.username_pw_set("Raspberry_Pi", "Rpi_Raspberry_Python")
+
+        client.connect(broker_address, 1881)
+
         app = CreateWebPage()
-        app.run_server(debug=True,host='0.0.0.0')
-        # app.run_server(host='0.0.0.0')
+        # app.run_server(debug=True,host='0.0.0.0')
+        app.run_server(host='0.0.0.0')
         # app.config.suppress_callback_exceptions = True
 
             
