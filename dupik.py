@@ -6,9 +6,9 @@ import time
 dir = 0
 pir = MotionSensor(4)
 servo = Servo(17)
-
+servo.value = 0
 def on_message(client, userdata, message):
-    global servo
+    global dir
     if message.topic == "position":
         # client.publish("test2", "ok", qos=0, retain=False)
         dir = int(message.payload.decode("utf-8"))
