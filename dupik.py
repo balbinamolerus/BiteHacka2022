@@ -1,4 +1,4 @@
-from time import sleep
+
 import paho.mqtt.client as mqtt
 from gpiozero import MotionSensor
 from gpiozero import Servo
@@ -42,9 +42,9 @@ while True:
     for i in range(30):
         if pir.wait_for_motion():
             motion += 1
-        sleep(0.01)
+        time.sleep(0.01)
         if motion > 10:
             # print('alarm')
             client.publish("alarm", "pir", qos=0, retain=False)
-            sleep(2)
+            time.sleep(2)
             break
