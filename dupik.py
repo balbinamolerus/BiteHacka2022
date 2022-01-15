@@ -9,5 +9,5 @@ GPIO.output(4, 0)
 
 GPIO.setup(4, GPIO.IN)
 while True:
-    if GPIO.input(14):
+    if GPIO.input(4):
         print('ruch')
