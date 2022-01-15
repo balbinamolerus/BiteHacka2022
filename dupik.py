@@ -24,7 +24,7 @@ client.connect(broker_address, 1881)
 client.loop_start()
 client.subscribe([("position", 0), ])
 
-
+print("aaaa")
 while True:
     print(dir)
     motion = 0
