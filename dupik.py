@@ -28,11 +28,13 @@ client.subscribe([("position", 0), ])
 while True:
     motion = 0
     if dir == 1:
+        print(dir)
         servo.max()
         time.sleep(1)
         servo.detach()
         dir = 0
     elif dir == -1:
+        print(dir)
         servo.min()
         time.sleep(1)
         servo.detach()
