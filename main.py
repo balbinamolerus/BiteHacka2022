@@ -22,13 +22,13 @@ while True:
     if i==0:                 #When output from motion sensor is LOW
         z=z+1
         print(j)
-        time.sleep(0.1)
         if z==2:
             j=0
             print ("No Intruder detected")
+        time.sleep(0.1)
     elif i==1: 
         z=0
         j=j+1
-        if j >=20:
+        if j > 25:
             print ("Intruder detected")
         time.sleep(0.1)
