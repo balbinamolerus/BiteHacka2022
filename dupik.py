@@ -9,9 +9,11 @@ servo = Servo(17)
 servo.detach()
 def on_message(client, userdata, message):
     global dir
+
     if message.topic == "position":
         # client.publish("test2", "ok", qos=0, retain=False)
         dir = int(message.payload.decode("utf-8"))
+        print(dir)
 
 
 broker_address = "192.168.0.123"
