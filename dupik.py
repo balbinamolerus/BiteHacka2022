@@ -24,6 +24,8 @@ client.loop_start()
 client.subscribe([("position", 0), ])
 
 print("aaaa")
+
+
 while True:
     print(direction)
     motion = 0
@@ -40,11 +42,11 @@ while True:
         servo.detach()
         direction = 0
     for i in range(30):
-        if pir.wait_for_motion():
+        if pir.motion_detected:
             motion += 1
         time.sleep(0.01)
         if motion > 10:
-            # print('alarm')
+            print('alarm')
             client.publish("alarm", "pir", qos=0, retain=False)
             time.sleep(2)
             break
