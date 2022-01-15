@@ -1,13 +1,16 @@
+
 from time import sleep
-import RPi.GPIO as GPIO
+from gpiozero import MotionSensor
+pir = MotionSensor(4)
 
-GPIO.setmode(GPIO.BCM)
-
-GPIO.setup(4, GPIO.OUT)
-
-GPIO.output(4, 0)
-
-GPIO.setup(4, GPIO.IN)
 while True:
-    if GPIO.input(4):
-        print('ruch')
+  x=0
+  t=0
+  while t<50:
+    if pir.wait_for_motion()==True:
+      x=x+1
+    sleep(0.1)
+    if x>20:
+      print('alarm')
+      x=0
+    t=t+1
