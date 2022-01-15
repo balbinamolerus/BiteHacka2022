@@ -6,7 +6,7 @@ import time
 dir = 0
 pir = MotionSensor(4)
 servo = Servo(17)
-servo.value = 0
+servo.detach()
 def on_message(client, userdata, message):
     global dir
     if message.topic == "position":
@@ -28,12 +28,12 @@ while True:
     if dir == 1:
         servo.max()
         time.sleep(1)
-        servo.mid()
+        servo.detach()
         dir = 0
     elif dir == -1:
         servo.min()
         time.sleep(1)
-        servo.mid()
+        servo.detach()
         dir = 0
     for i in range(30):
         if pir.wait_for_motion() == True:
