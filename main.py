@@ -28,6 +28,6 @@ while True:
     elif i==1: 
         z=0
         j=j+1
-        if j > 25:
+        if j > 15:
             print ("Intruder detected")
         time.sleep(0.1)
