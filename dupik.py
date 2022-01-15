@@ -25,9 +25,15 @@ client.subscribe([("position", 0), ])
 
 while True:
     motion = 0
-    if dir:
-        servo.value = dir
+    if dir == 1:
+        servo.max()
         time.sleep(1)
+        servo.mid()
+        dir = 0
+    elif dir == -1:
+        servo.min()
+        time.sleep(1)
+        servo.mid()
         dir = 0
     for i in range(30):
         if pir.wait_for_motion() == True:
