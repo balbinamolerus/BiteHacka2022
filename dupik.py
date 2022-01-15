@@ -14,7 +14,7 @@ def on_message(client, userdata, message):
     if message.topic == "position":
         # client.publish("test2", "ok", qos=0, retain=False)
         direction = int(message.payload.decode("utf-8"))
-        print(direction)
+
 
 
 broker_address = "192.168.0.123"
@@ -25,19 +25,16 @@ client.connect(broker_address, 1881)
 client.loop_start()
 client.subscribe([("position", 0), ])
 
-print("aaaa")
+
 
 while True:
-    print(direction)
     motion = 0
     if direction == 1:
-        print(direction)
         servo.max()
         time.sleep(0.02)
         servo.detach()
         direction = 0
     elif direction == -1:
-        print(dir)
         servo.min()
         time.sleep(0.02)
         servo.detach()
