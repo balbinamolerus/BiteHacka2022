@@ -1,12 +1,14 @@
-
 import paho.mqtt.client as mqtt
 from gpiozero import MotionSensor
 from gpiozero import Servo
 import time
+
 direction = 0
 pir = MotionSensor(4)
 servo = Servo(17)
 servo.detach()
+
+
 def on_message(client, userdata, message):
     global direction
     if message.topic == "position":
@@ -24,7 +26,6 @@ client.loop_start()
 client.subscribe([("position", 0), ])
 
 print("aaaa")
-
 
 while True:
     print(direction)
