@@ -16,6 +16,7 @@ GPIO.add_event_detect(channel, GPIO.BOTH, bouncetime=300)  # let us know when th
 GPIO.add_event_callback(channel, callback)  # assign function to GPIO PIN, Run function on change
 # infinite loop
 j=0
+z=0
 while True:
     i=GPIO.input(channel_pir)
     if i==0:                 #When output from motion sensor is LOW
