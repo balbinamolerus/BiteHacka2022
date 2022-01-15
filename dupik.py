@@ -11,3 +11,4 @@ while True:
         sleep(0.01)
     if motion > 10:
         print('alarm')
+        sleep(0.1)
