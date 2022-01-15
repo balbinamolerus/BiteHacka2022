@@ -32,13 +32,13 @@ while True:
     if direction == 1:
         print(direction)
         servo.max()
-        time.sleep(1)
+        time.sleep(0.35)
         servo.detach()
         direction = 0
     elif direction == -1:
         print(dir)
         servo.min()
-        time.sleep(1)
+        time.sleep(0.35)
         servo.detach()
         direction = 0
     for i in range(30):
