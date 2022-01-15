@@ -2,17 +2,16 @@ from time import sleep
 import paho.mqtt.client as mqtt
 from gpiozero import MotionSensor
 from gpiozero import Servo
-
-
+import time
+dir = 0
 pir = MotionSensor(4)
-servo = Servo(17,min_pulse_width=5/10000, max_pulse_width=25/10000, frame_width=1/330)
+servo = Servo(17)
 
 def on_message(client, userdata, message):
     global servo
     if message.topic == "position":
         # client.publish("test2", "ok", qos=0, retain=False)
-        pos = int(message.payload.decode("utf-8"))
-        servo.value = (pos/50)-1
+        dir = int(message.payload.decode("utf-8"))
 
 
 broker_address = "192.168.0.123"
@@ -26,6 +25,10 @@ client.subscribe([("position", 0), ])
 
 while True:
     motion = 0
+    if dir:
+        servo.value = dir
+        time.sleep(1)
+        dir = 0
     for i in range(30):
         if pir.wait_for_motion() == True:
             motion += 1
