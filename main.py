@@ -1,2 +1,0 @@
-print('dupa')
-print('Olszewski')
