@@ -5,7 +5,7 @@ from gpiozero import Servo
 
 
 pir = MotionSensor(4)
-servo = Servo(17)
+servo = Servo(17,min_pulse_width=5/10000, max_pulse_width=25/10000, frame_width=1/330)
 
 def on_message(client, userdata, message):
     global servo
