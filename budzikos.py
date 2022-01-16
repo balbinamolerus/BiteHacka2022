@@ -95,7 +95,7 @@ with stream:
         elif currAlarm == 2:
             bigAlarm()
             currAlarm = 0
-        if datetime.now().hour == int(alarmtim[0]) and datetime.now().minute == int(alarmtim[1]):
+        if datetime.now().hour + 1 == int(alarmtim[0]) and datetime.now().minute == int(alarmtim[1]):
             while clockAlarm:
                 startAlarm()
             stopAlarm()
