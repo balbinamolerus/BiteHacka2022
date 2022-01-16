@@ -65,3 +65,5 @@ while True:
         knock = 0
     
     time.sleep(2)
+    rreset_knock = knock
+    rreset_door = doors
