@@ -58,8 +58,6 @@ while True:
     if rreset_door == doors:
         doors = 0
         door_open = 0
-    print(knock)
-    print(rreset_knock)
     if rreset_knock == knock:
         knock = 0
     rreset_knock = knock
