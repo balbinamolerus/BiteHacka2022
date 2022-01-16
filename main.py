@@ -56,7 +56,7 @@ while True:
         print('The door was opened')
         bocik.msg_all('The door was opened')
 
-    if knock > 3:
+    if knock > 3 & knock_turn == 0:
         knock_turn = 1
         print('knock knock')
         bocik.msg_all('knock knock')
