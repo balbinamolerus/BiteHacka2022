@@ -8,8 +8,6 @@ alarmtim = None
 currAlarm = 0
 alarmPin = 4
 clockAlarm = False
-h = 0
-mn = 0
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(alarmPin, GPIO.OUT)
