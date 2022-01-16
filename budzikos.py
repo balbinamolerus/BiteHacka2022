@@ -29,9 +29,9 @@ def on_message(client, userdata, message):
 
 def startAlarm():
     GPIO.output(alarmPin, GPIO.HIGH)
-    time.sleep(0.5)
+    time.sleep(0.2)
     GPIO.output(alarmPin, GPIO.LOW)
-    time.sleep(0.5)
+    time.sleep(0.2)
 
 
 def warningAlarm():
@@ -40,11 +40,11 @@ def warningAlarm():
         time.sleep(0.5)
         GPIO.output(alarmPin, GPIO.LOW)
         time.sleep(0.5)
-    GPIO.output(alarmPin, GPIO.LOW)
+    GPIO.output(alarmPin, GPIO.HIGH)
 
 
 def stopAlarm():
-    GPIO.output(alarmPin, GPIO.LOW)
+    GPIO.output(alarmPin, GPIO.HIGH)
 
 
 def clock():
