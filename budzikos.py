@@ -70,7 +70,7 @@ def audio_callback(indata, frames, time, status):
     global client, currAlarm
     volume_norm = np.linalg.norm(indata) * 10
     print(volume_norm)
-    if volume_norm > 10:
+    if volume_norm > 20:
         print("boo")
         client.publish('LoundNoise', 'Alarm', qos=0, retain=False)
         currAlarm = 2
