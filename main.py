@@ -49,8 +49,8 @@ GPIO.add_event_callback(channel_pir, callback_pir)  # assign function to GPIO PI
 while True:
     if doors > 5 & door_open == 0:
         door_open = 1
-        print('The door is open')
-    #    bocik.msg_all('The door is open')
+        print('The door was opened')
+    #    bocik.msg_all('The door was opened')
 
     if knock > 1:
         print('knock knock')
