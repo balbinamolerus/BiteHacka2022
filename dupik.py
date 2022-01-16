@@ -17,8 +17,10 @@ def on_message(client, userdata, message):
         direction = int(message.payload.decode("utf-8"))
     elif message.topic == "alarm" and str(message.payload.decode("utf-8")) == "pir1":
         piren = True
+        print(piren)
     elif message.topic == "alarm" and str(message.payload.decode("utf-8")) == "pir0":
         piren = False
+        print(piren)
 
 
 broker_address = "192.168.0.123"
