@@ -35,7 +35,7 @@ bocik = Telegram()
 
 def on_message(client, userdata, message):
     global bocik
-    bocik.msg_all('Alarm detected lmao')
+    bocik.msg_all('Alarm detected')
     print("message received")
 
 
