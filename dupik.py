@@ -12,6 +12,7 @@ piren = False
 
 def on_message(client, userdata, message):
     global direction, piren
+    print(str(message.payload.decode("utf-8")))
     if message.topic == "position":
         # client.publish("test2", "ok", qos=0, retain=False)
         direction = int(message.payload.decode("utf-8"))
@@ -29,7 +30,7 @@ client.username_pw_set("Raspberry_Pi", "Rpi_Raspberry_Python")
 client.on_message = on_message
 client.connect(broker_address, 1881)
 client.loop_start()
-client.subscribe([("position", 0), ])
+client.subscribe([("position", 0), ("alarm", 0)])
 
 
 
