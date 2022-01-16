@@ -9,12 +9,17 @@ import cv2
 from flask import Flask, Response
 import paho.mqtt.client as mqtt
 
+
+# Global Variables
 text_buffer = ''
 status = 'Waiting'
 speech_timeout = 5
 interval = 300 #[ms]
 remaining_time = 0
 client = None
+position_topic = 'position'
+# End of global variables
+
 
 # Camera Feed
 class VideoCamera(object):
@@ -28,7 +33,6 @@ class VideoCamera(object):
         success, image = self.video.read()
         ret, jpeg = cv2.imencode('.jpg', image)
         return jpeg.tobytes()
-
 
 def gen(camera):
     while True:
@@ -78,7 +82,7 @@ def CreateLogger():
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-
+# Speech to text Tab
 def SpeechToText():
     return [
     dcc.Interval(
@@ -90,7 +94,7 @@ def SpeechToText():
     html.Div([
         html.Button('Clear Text', id='clear_button', style={'display':'inline-block'}),
         html.Button('Start recognition', id='speech_button', style={'display':'inline-block',"margin-left": "2px"}),
-        html.P(id='status-text-output', children = ['Status: '], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px"}),
+        html.P(id='status-text-output', children = ['Status:'], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px"}),
         html.B(id='status-output', children = ['Waiting'], style={'whiteSpace': 'pre-line','display':'inline-block',"margin-left": "5px", 'color': 'red'})
         ]),
     html.B( children = ['Speech lenght: '], style={'whiteSpace': 'pre-line','display':'inline-block'}),
@@ -110,23 +114,22 @@ def SpeechToText():
     ]),
     html.Hr(),
     html.Div(id='text-output', children = [''], style={'whiteSpace': 'pre-line'}),
+        ]   
+# End of Speech to text Tab
 
-        ]
 
+# Video feed Tab
 def VideoFeed():
     return[
-    html.H1("Webcam Test"),
-    dcc.Slider(
-        id = 'position-slider',
-        min=0,
-        max=100,
-        step=10,
-        value=0,
-        dots = True,
-        tooltip={"placement": "left", "always_visible": True}
-    ),
+    html.H1("Connected Webcam Feed and Position"),
+    html.Div([
+    html.Button('Camera Left', id='camera-button-left', style={'display':'inline-block'}),
+    html.Button('Camera Right', id='camera-button-right', style={'display':'inline-block'}),
+    ]),
     html.Img(src="/video_feed")
     ]
+# End of Video feed Tab
+
 
 
 def CreateWebPage():
@@ -145,7 +148,7 @@ def CreateWebPage():
         html.Div(id='hidden-div', style={'display':'none'}),
         html.Div(id='hidden-div2', style={'display':'none'}),  
         html.Div(id='hidden-div3', style={'display':'none'}),  
-        
+        html.Div(id='hidden-div4', style={'display':'none'}),  
     ])
 
 
@@ -168,12 +171,13 @@ def CreateWebPage():
         prevent_initial_call=True
     )
     def update_output(n_clicks):
-        global text_buffer, speech_timeout, remaining_time
-        if remaining_time == 0:
-            remaining_time = int(speech_timeout)
-            text = recognize_speech_from_mic()
-            text_buffer += f'[{(datetime.datetime.today()).strftime("%H:%M:%S")}]: {text}\n'
-        return dash.no_update
+        if dash.callback_context.triggered[0]['value'] != None:
+            global text_buffer, speech_timeout, remaining_time
+            if remaining_time == 0:
+                remaining_time = int(speech_timeout)
+                text = recognize_speech_from_mic()
+                text_buffer += f'[{(datetime.datetime.today()).strftime("%H:%M:%S")}]: {text}\n'
+            return dash.no_update
 
     @app.callback(
         Output('hidden-div2', 'children'),
@@ -181,9 +185,9 @@ def CreateWebPage():
         prevent_initial_call=True
     )
     def clear_output(n_clicks):
-        global text_buffer, client
-        text_buffer = ''
-        return dash.no_update
+        if dash.callback_context.triggered[0]['value'] != None:
+            global text_buffer, client
+            text_buffer = ''
 
     @app.callback(
         Output('text-output', 'children'),
@@ -214,21 +218,33 @@ def CreateWebPage():
 
     @app.callback(
         Output('hidden-div3', 'children'),
-        Input('position-slider', 'value'),
+        Input('camera-button-left', 'n_clicks'),
         prevent_initial_call=True
     )
-    def send_position(value):
-        global client
-        client.publish("position", value, qos=0, retain=False)
-        text_buffer = ''
-        return dash.no_update
+    def send_position_left(n_clicks):
+        if dash.callback_context.triggered[0]['value'] != None:
+            global client, position_topic
+            client.publish(position_topic, -1, qos=0, retain=False)
+            return dash.no_update
+
+
+    @app.callback(
+        Output('hidden-div4', 'children'),
+        Input('camera-button-right', 'n_clicks'),
+        prevent_initial_call=True
+    )
+    def send_position_right(n_clicks):
+        if dash.callback_context.triggered[0]['value'] != None:
+            global client, position_topic
+            client.publish(position_topic, 1, qos=0, retain=False)
+            return dash.no_update
 
 
     return app
 
+
 # Main Function
 ###############################################################################################################################
-
 def main():
     global received_flag,received_frame, client
 
