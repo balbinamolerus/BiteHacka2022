@@ -8,6 +8,7 @@ global knock
 global doors
 doors = 0
 door_open = 0
+knock_turn = 0
 knock = 0
 rreset_door = 0
 rreset_knock = 0
@@ -56,6 +57,7 @@ while True:
         bocik.msg_all('The door was opened')
 
     if knock > 3:
+        knock_turn = 1
         print('knock knock')
         bocik.msg_all('knock knock')
     if rreset_door == doors:
@@ -63,6 +65,7 @@ while True:
         door_open = 0
     if rreset_knock == knock:
         knock = 0
+        knock_turn = 0
     rreset_knock = knock
     rreset_door = doors
     time.sleep(2)
