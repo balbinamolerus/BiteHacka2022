@@ -69,6 +69,7 @@ def clock():
 def audio_callback(indata, frames, time, status):
     global client, currAlarm
     volume_norm = np.linalg.norm(indata) * 10
+    print(volume_norm)
     if volume_norm > 700:
         print("boo")
         client.publish('LoundNoise', 'Alarm', qos=0, retain=False)
@@ -87,7 +88,7 @@ stream = sd.InputStream(callback=audio_callback)
 with stream:
     while True:
         time.sleep(1)
-        print(datetime.now().hour, datetime.now().minute, int(alarmtim[0]), int(alarmtim[1]))
+        # print(datetime.now().hour, datetime.now().minute, int(alarmtim[0]), int(alarmtim[1]))
         if currAlarm == 1:
             warningAlarm()
             currAlarm = 0
