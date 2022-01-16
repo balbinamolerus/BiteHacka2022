@@ -53,14 +53,14 @@ client.subscribe("alarm")
 while True:
     if doors > 5 & door_open == 0:
         door_open = 1
-        client.publish("door_alarm", "door", qos=0, retain=False)
+        client.publish("alarm", "door", qos=0, retain=False)
         print('The door was opened')
         bocik.msg_all('The door was opened')
 
     if knock > 3 & knock_turn == 0:
         knock_turn = 1
         print('knock knock')
-        client.publish("door_alarm", "knock", qos=0, retain=False)
+        client.publish("alarm", "knock", qos=0, retain=False)
         bocik.msg_all('knock knock')
     if rreset_door == doors:
         doors = 0
