@@ -4,7 +4,7 @@ import time
 from datetime import datetime, date
 
 alarmen = False
-alarmtim = None
+alarmtim = ('0', '0')
 currAlarm = 0
 alarmPin = 4
 clockAlarm = False
@@ -51,7 +51,6 @@ def clock():
     global h, min, clockAlarm
 
 
-
 broker_address = "192.168.0.123"
 client = mqtt.Client()
 client.username_pw_set("Raspberry_Pi", "Rpi_Raspberry_Python")
@@ -64,7 +63,7 @@ while True:
     if currAlarm:
         warningAlarm()
         currAlarm = 0
-    if datetime.now().hour == alarmtim[0] and datetime.now().minute == alarmtim[1]:
+    if datetime.now().hour == int(alarmtim[0]) and datetime.now().minute == int(alarmtim[1]):
         while clockAlarm:
             startAlarm()
         stopAlarm()
