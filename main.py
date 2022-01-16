@@ -57,7 +57,8 @@ while True:
         # bocik.msg_all('knock knock')
     if rreset_door == doors:
         doors = 0
-
+    print('rreset_knock'+rreset_knock)
+    print('knock'+knock)
     if rreset_knock == knock:
         knock = 0
     
