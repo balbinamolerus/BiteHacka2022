@@ -84,16 +84,17 @@ client.connect(broker_address, 1881)
 client.loop_start()
 client.subscribe([("alarm", 0), ("alarmclock", 0)])
 stream = sd.InputStream(callback=audio_callback)
-while True:
-    time.sleep(1)
-    print(datetime.now().hour, datetime.now().minute, int(alarmtim[0]), int(alarmtim[1]))
-    if currAlarm == 1:
-        warningAlarm()
-        currAlarm = 0
-    elif currAlarm == 2:
-        bigAlarm()
-        currAlarm = 0
-    if datetime.now().hour == int(alarmtim[0]) and datetime.now().minute == int(alarmtim[1]):
-        while clockAlarm:
-            startAlarm()
-        stopAlarm()
+with stream:
+    while True:
+        time.sleep(1)
+        print(datetime.now().hour, datetime.now().minute, int(alarmtim[0]), int(alarmtim[1]))
+        if currAlarm == 1:
+            warningAlarm()
+            currAlarm = 0
+        elif currAlarm == 2:
+            bigAlarm()
+            currAlarm = 0
+        if datetime.now().hour == int(alarmtim[0]) and datetime.now().minute == int(alarmtim[1]):
+            while clockAlarm:
+                startAlarm()
+            stopAlarm()
