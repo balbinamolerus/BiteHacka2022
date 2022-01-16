@@ -3,7 +3,8 @@ import RPi.GPIO as GPIO
 import time
 from telegram import Telegram
 
-
+global knock
+global doors
 doors = 0
 door_open = 0
 knock = 0
