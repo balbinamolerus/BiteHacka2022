@@ -50,11 +50,11 @@ while True:
     if doors > 5 & door_open == 0:
         door_open = 1
         print('The door was opened')
-    #    bocik.msg_all('The door was opened')
+        bocik.msg_all('The door was opened')
 
     if knock > 1:
         print('knock knock')
-        # bocik.msg_all('knock knock')
+        bocik.msg_all('knock knock')
     if rreset_door == doors:
         doors = 0
         door_open = 0
