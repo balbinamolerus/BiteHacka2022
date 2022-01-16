@@ -23,6 +23,7 @@ def on_message(client, userdata, message):
     if message.topic == "alarmclock" and ',' in str(message.payload.decode("utf-8")):
         clockAlarm = True
         alarmtim = (str(message.payload.decode("utf-8"))[:2], str(message.payload.decode("utf-8"))[3:])
+        print(alarmtim)
     if message.topic == "alarmclock" and (str(message.payload.decode("utf-8")) == 'disable'):
         clockAlarm = False
 
@@ -60,6 +61,8 @@ client.loop_start()
 client.subscribe([("alarm", 0), ("alarmclock", 0)])
 
 while True:
+    time.sleep(1)
+    print(datetime.now().hour, datetime.now().minute,int(alarmtim[0]),int(alarmtim[1]))
     if currAlarm:
         warningAlarm()
         currAlarm = 0
