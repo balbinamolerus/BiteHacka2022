@@ -60,7 +60,8 @@ while True:
         door_open = 0
     if rreset_knock == knock:
         knock = 0
-    
+    print(knock)
+    print(rreset_knock)
     time.sleep(2)
     rreset_knock = knock
     rreset_door = doors
